@@ -1,0 +1,7 @@
+name = "hijabi-bridal-cloudflare"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[[kv_namespaces]]
+binding = "ORDERS_KV"
+id = "914e04ae5ab94be5a92d9a3cea37cf81"
