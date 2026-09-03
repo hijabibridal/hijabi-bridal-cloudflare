@@ -5,3 +5,12 @@ compatibility_date = "2026-09-01"
 [[kv_namespaces]]
 binding = "ORDERS_KV"
 id = "914e04ae5ab94be5a92d9a3cea37cf81"
+
+# Enables persistent, searchable logs in the Cloudflare dashboard —
+# without this, only a live "watch it happen right now" stream works,
+# and nothing gets saved to look back at afterward.
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
