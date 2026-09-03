@@ -7,6 +7,9 @@ export async function handleOrderWebhook(request, env) {
   }
 
   const rawBody = await request.text()
+  console.log('Raw body length:', rawBody.length)
+  console.log('Raw body (first 200 chars):', rawBody.slice(0, 200))
+
   // querystring.parse (Node) isn't available — URLSearchParams handles
   // the same x-www-form-urlencoded format natively in Workers.
   const ipnData = Object.fromEntries(new URLSearchParams(rawBody).entries())
@@ -18,12 +21,17 @@ export async function handleOrderWebhook(request, env) {
       : 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
 
   const verifyBody = 'cmd=_notify-validate&' + rawBody
+  console.log('Verify URL:', PAYPAL_IPN_VERIFY_URL)
+  console.log('Verify body (first 200 chars):', verifyBody.slice(0, 200))
+
   const verifyResponse = await fetch(PAYPAL_IPN_VERIFY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: verifyBody,
   })
   const verifyText = await verifyResponse.text()
+  console.log('Verify response status:', verifyResponse.status)
+  console.log('Verify response text:', verifyText)
 
   if (verifyText !== 'VERIFIED') {
     console.error('IPN verification failed:', verifyText)
