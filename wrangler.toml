@@ -1,0 +1,19 @@
+name = "hijabi-bridal-cloudflare"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+PAYPAL_ENV = "live"
+EMAIL_FROM = "Hijabi Bridal <orders@halalnails.vip>"
+PAYPAL_CLIENT_ID = "BAAYoVVna5Xc7jZjLHp3aU44-gGQEsR5J4suS_7EPMjdwN9gMq5WuLGuOtqIQ3V1B8tonRiznu5DcYAeOQ"
+XLWMS_APP_KEY = "ea290c00b1924970acc280e8504599fa"
+
+[[kv_namespaces]]
+binding = "ORDERS_KV"
+id = "914e04ae5ab94be5a92d9a3cea37cf81"
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
