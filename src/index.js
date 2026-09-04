@@ -2,6 +2,7 @@ import { CORS_HEADERS } from './utils.js'
 import { handleOrderWebhook } from './orderWebhook.js'
 import { handleListOrders, handleUpdateOrderStatus } from './adminOrders.js'
 import { handleCreateOrder, handleCaptureOrder } from './googlePay.js'
+import { handleSendFeedback } from './feedback.js'
 
 export default {
   async fetch(request, env, ctx) {
@@ -23,6 +24,8 @@ export default {
         return handleCreateOrder(request, env)
       case '/capture-order':
         return handleCaptureOrder(request, env)
+      case '/send-feedback':
+        return handleSendFeedback(request, env)
       default:
         return new Response('Not found', { status: 404 })
     }
