@@ -2,7 +2,7 @@
 // work in Workers at all since raw TCP sockets aren't available here) ──
 const REPLY_TO_EMAIL = 'bridalhijabi@gmail.com'
 
-export async function sendEmail(env, { to, subject, html }) {
+export async function sendEmail(env, { to, subject, html, replyTo }) {
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -14,7 +14,7 @@ export async function sendEmail(env, { to, subject, html }) {
       to,
       subject,
       html,
-      reply_to: REPLY_TO_EMAIL,
+      reply_to: replyTo || REPLY_TO_EMAIL,
     }),
   })
 
@@ -104,5 +104,18 @@ export function buildRefundEmail({ customerName, items, amount }) {
     ${itemsHtml(items)}
     <p>Please allow a few business days for it to appear on your original payment method.</p>
     <p>With love,<br/>Hijabi Bridal</p>
+  `)
+}
+
+// This one flows the opposite direction — customer to business, via the
+// thank-you page's feedback box.
+export function buildFeedbackNotificationEmail({ customerName, customerEmail, orderSummaryText, message }) {
+  return wrapEmail(`
+    <h2 style="font-size: 18px;">New message from a customer</h2>
+    <p><strong>From:</strong> ${customerName || 'Unknown'} (${customerEmail || 'no email provided'})</p>
+    ${orderSummaryText ? `<p><strong>Order:</strong> ${orderSummaryText}</p>` : ''}
+    <p><strong>Message:</strong></p>
+    <p style="background: #fdf2f8; padding: 12px; border-radius: 8px;">${message}</p>
+    <p style="font-size: 12px; color: #888;">Reply directly to this email to respond to the customer.</p>
   `)
 }
