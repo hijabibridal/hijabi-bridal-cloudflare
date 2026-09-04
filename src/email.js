@@ -1,5 +1,7 @@
 // ─── Sending (Resend HTTP API — replaces nodemailer/SMTP, which cannot
 // work in Workers at all since raw TCP sockets aren't available here) ──
+const REPLY_TO_EMAIL = 'bridalhijabi@gmail.com'
+
 export async function sendEmail(env, { to, subject, html }) {
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -12,6 +14,7 @@ export async function sendEmail(env, { to, subject, html }) {
       to,
       subject,
       html,
+      reply_to: REPLY_TO_EMAIL,
     }),
   })
 
