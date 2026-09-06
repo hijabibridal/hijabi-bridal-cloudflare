@@ -4,6 +4,7 @@ import { handleListOrders, handleUpdateOrderStatus } from './adminOrders.js'
 import { handleCreateOrder, handleCaptureOrder } from './googlePay.js'
 import { handleSendFeedback } from './feedback.js'
 import { handleAddressAutocomplete, handleAddressDetails } from './addressAutocomplete.js'
+import { handleCapturePartialCheckout, checkAbandonedCarts } from './abandonedCart.js'
 
 export default {
   async fetch(request, env, ctx) {
@@ -31,8 +32,17 @@ export default {
         return handleAddressAutocomplete(request, env)
       case '/address-details':
         return handleAddressDetails(request, env)
+      case '/capture-partial-checkout':
+        return handleCapturePartialCheckout(request, env)
       default:
         return new Response('Not found', { status: 404 })
     }
+  },
+
+  // Cloudflare calls this automatically on the schedule set in
+  // wrangler.toml — this is what actually sends abandoned-cart emails,
+  // independent of any customer visiting the site.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(checkAbandonedCarts(env))
   },
 }
