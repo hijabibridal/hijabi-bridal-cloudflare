@@ -107,6 +107,21 @@ export function buildRefundEmail({ customerName, items, amount }) {
   `)
 }
 
+export function buildAbandonedCartEmail({ customerName, items }) {
+  return wrapEmail(`
+    <h2 style="font-size: 18px;">You left something beautiful behind 💅</h2>
+    <p>Hi ${customerName || 'there'},</p>
+    <p>We noticed you didn't finish checking out — your Halal Nails are still waiting for you!</p>
+    ${itemsHtml(items)}
+    <p style="text-align: center; margin: 24px 0;">
+      <a href="https://hijabibridal.github.io/cart" style="background: #db2777; color: #fff; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 13px;">
+        Return to Cart
+      </a>
+    </p>
+    <p>With love,<br/>Hijabi Bridal</p>
+  `)
+}
+
 // This one flows the opposite direction — customer to business, via the
 // thank-you page's feedback box.
 export function buildFeedbackNotificationEmail({ customerName, customerEmail, orderSummaryText, message }) {
