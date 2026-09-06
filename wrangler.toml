@@ -12,6 +12,12 @@ XLWMS_APP_KEY = "ea290c00b1924970acc280e8504599fa"
 binding = "ORDERS_KV"
 id = "914e04ae5ab94be5a92d9a3cea37cf81"
 
+# Runs every 10 minutes — checkAbandonedCarts() itself only actually
+# sends an email once a record is 30+ minutes old, so this just needs
+# to check often enough not to miss that window by much.
+[triggers]
+crons = ["*/10 * * * *"]
+
 [observability]
 enabled = true
 
