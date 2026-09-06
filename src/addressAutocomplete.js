@@ -22,7 +22,7 @@ export async function handleAddressAutocomplete(request, env) {
   }
 
   try {
-    const { input, countryCode } = await request.json()
+    const { input, countryCode, sessionToken } = await request.json()
     if (!input || input.length < 3) {
       return jsonResponse({ suggestions: [] })
     }
@@ -37,6 +37,7 @@ export async function handleAddressAutocomplete(request, env) {
         input,
         includedRegionCodes: countryCode ? [countryCode.toLowerCase()] : undefined,
         includedPrimaryTypes: ['street_address'],
+        sessionToken,
       }),
     })
 
@@ -67,12 +68,15 @@ export async function handleAddressDetails(request, env) {
   }
 
   try {
-    const { placeId } = await request.json()
+    const { placeId, sessionToken } = await request.json()
     if (!placeId) {
       return jsonResponse({ error: 'Missing placeId' }, 400)
     }
 
-    const response = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
+    const url = new URL(`https://places.googleapis.com/v1/places/${placeId}`)
+    if (sessionToken) url.searchParams.set('sessionToken', sessionToken)
+
+    const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
         'X-Goog-Api-Key': env.GOOGLE_PLACES_SERVER_KEY,
