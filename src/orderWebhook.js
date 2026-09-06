@@ -1,5 +1,6 @@
 import { saveOrder, getOrder, signXlwmsRequest, getLogisticsChannel } from './utils.js'
 import { sendEmail, buildRefundEmail } from './email.js'
+import { clearPartialCheckout } from './abandonedCart.js'
 
 export async function handleOrderWebhook(request, env) {
   if (request.method !== 'POST') {
@@ -143,6 +144,10 @@ export async function handleOrderWebhook(request, env) {
       status: 'paid',
       xlwmsSuccess: xlwmsResult?.data?.[0]?.success ?? false,
     })
+
+    // A real order came through — no need for an abandoned-cart
+    // follow-up for this customer anymore.
+    await clearPartialCheckout(env, ipnData.payer_email)
   } catch (err) {
     console.error('Failed to save order to store:', err)
   }
