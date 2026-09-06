@@ -3,6 +3,7 @@ import { handleOrderWebhook } from './orderWebhook.js'
 import { handleListOrders, handleUpdateOrderStatus } from './adminOrders.js'
 import { handleCreateOrder, handleCaptureOrder } from './googlePay.js'
 import { handleSendFeedback } from './feedback.js'
+import { handleAddressAutocomplete, handleAddressDetails } from './addressAutocomplete.js'
 
 export default {
   async fetch(request, env, ctx) {
@@ -26,6 +27,10 @@ export default {
         return handleCaptureOrder(request, env)
       case '/send-feedback':
         return handleSendFeedback(request, env)
+      case '/address-autocomplete':
+        return handleAddressAutocomplete(request, env)
+      case '/address-details':
+        return handleAddressDetails(request, env)
       default:
         return new Response('Not found', { status: 404 })
     }
