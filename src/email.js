@@ -10,7 +10,7 @@ export async function sendEmail(env, { to, subject, html, replyTo }) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: env.EMAIL_FROM, // e.g. "Hijabi Bridal <orders@halalnails.vip>"
+      from: env.EMAIL_FROM, // e.g. "Halal Nails <orders@halalnails.vip>"
       to,
       subject,
       html,
@@ -43,11 +43,11 @@ function wrapEmail(bodyHtml) {
   return `
   <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; color: #1a1a1a;">
     <h1 style="color: #db2777; font-size: 22px; text-transform: uppercase; letter-spacing: -0.5px;">
-      Hijabi Bridal
+      Halal Nails
     </h1>
     ${bodyHtml}
     <p style="font-size: 12px; color: #888; margin-top: 32px;">
-      Hijabi Bridal — hijabibridal.github.io
+      Halal Nails — hijabibridal.github.io
     </p>
   </div>`
 }
@@ -67,7 +67,7 @@ export function buildOrderProcessingEmail({ customerName, items }) {
     <p>Just confirming that we have your order and are processing it now! Please give us three days to ship your order.</p>
     ${itemsHtml(items)}
     <p>On it's way soon!</p>
-    <p>With love,<br/>Hijabi Bridal</p>
+    <p>With love,<br/>Halal Nails</p>
     <p>Questions? Write us at bridalhijabi@gmail.com</p>
   `)
 }
@@ -79,7 +79,7 @@ export function buildCustomsHoldEmail({ customerName, items }) {
     <p>Your order is currently in customs clearance. This is a routine step for international shipments and does not require any action from you.</p>
     ${itemsHtml(items)}
     <p>We'll notify you as soon as it clears and is on its way to you.</p>
-    <p>With love,<br/>Hijabi Bridal</p>
+    <p>With love,<br/>Halal Nails</p>
   `)
 }
 
@@ -124,7 +124,7 @@ export function buildShippedEmail({ customerName, items, trackingNumber, carrier
     ${transitLine}
     ${trackingUrl ? `<p><a href="${trackingUrl}" style="color: #db2777;">Track your package →</a></p>` : ''}
     <p>Can't wait for you to try them!</p>
-    <p>With love,<br/>Hijabi Bridal</p>
+    <p>With love,<br/>Halal Nails</p>
   `)
 }
 
@@ -135,7 +135,7 @@ export function buildRefundEmail({ customerName, items, amount }) {
     <p>We've processed a refund of $${amount} for your order.</p>
     ${itemsHtml(items)}
     <p>Please allow a few business days for it to appear on your original payment method.</p>
-    <p>With love,<br/>Hijabi Bridal</p>
+    <p>With love,<br/>Halal Nails</p>
   `)
 }
 
@@ -150,7 +150,7 @@ export function buildAbandonedCartEmail({ customerName, items }) {
         Return to Cart
       </a>
     </p>
-    <p>With love,<br/>Hijabi Bridal</p>
+    <p>With love,<br/>Halal Nails</p>
   `)
 }
 
