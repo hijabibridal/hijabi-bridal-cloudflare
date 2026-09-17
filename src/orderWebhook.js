@@ -1,6 +1,8 @@
 import { saveOrder, getOrder, signXlwmsRequest, getLogisticsChannel } from './utils.js'
-import { sendEmail, buildRefundEmail } from './email.js'
+import { sendEmail, buildRefundEmail, buildNewOrderAlertEmail } from './email.js'
 import { clearPartialCheckout } from './abandonedCart.js'
+
+const BUSINESS_EMAIL = 'bridalhijabi@gmail.com'
 
 export async function handleOrderWebhook(request, env) {
   if (request.method !== 'POST') {
@@ -61,7 +63,7 @@ export async function handleOrderWebhook(request, env) {
 
     await sendEmail(env, {
       to: order.email,
-      subject: 'Your Hijabi Bridal refund has been processed',
+      subject: 'Your Halal Nails refund has been processed',
       html: buildRefundEmail({ customerName: order.customerName, items: order.items, amount: refundAmount }),
     })
 
@@ -123,6 +125,8 @@ export async function handleOrderWebhook(request, env) {
   const xlwmsResult = await xlwmsResponse.json()
   console.log('XLWMS response:', xlwmsResult)
 
+  const lingxingOrderNo = xlwmsResult?.data?.[0]?.orderNo || null
+
   try {
     await saveOrder(env, ipnData.txn_id, {
       orderId: ipnData.txn_id,
@@ -143,6 +147,7 @@ export async function handleOrderWebhook(request, env) {
       capturedAt: new Date().toISOString(),
       status: 'paid',
       xlwmsSuccess: xlwmsResult?.data?.[0]?.success ?? false,
+      lingxingOrderNo,
     })
 
     // A real order came through — no need for an abandoned-cart
@@ -150,6 +155,36 @@ export async function handleOrderWebhook(request, env) {
     await clearPartialCheckout(env, ipnData.payer_email)
   } catch (err) {
     console.error('Failed to save order to store:', err)
+  }
+
+  // Internal alert to the business inbox — separate from the
+  // customer-facing "order processing" email.
+  try {
+    await sendEmail(env, {
+      to: BUSINESS_EMAIL,
+      subject: 'You have an order!',
+      html: buildNewOrderAlertEmail({
+        customerName: ipnData.address_name,
+        email: ipnData.payer_email,
+        phone,
+        addressLine1: ipnData.address_street,
+        city: ipnData.address_city,
+        state: ipnData.address_state,
+        postalCode: ipnData.address_zip,
+        country: ipnData.address_country_code,
+        deliveryInstructions: notePart,
+        items: skuList.map((entry) => {
+          const [sku, qty] = entry.split('x')
+          return { sku, quantity: parseInt(qty, 10) || 1 }
+        }),
+        total: ipnData.mc_gross,
+        paymentMethod: 'PayPal',
+        paypalTxnId: ipnData.txn_id,
+        lingxingOrderNo,
+      }),
+    })
+  } catch (err) {
+    console.error('Failed to send new-order alert email:', err)
   }
 
   return new Response(JSON.stringify({ received: true, xlwmsResult }), {
