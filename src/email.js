@@ -64,10 +64,11 @@ export function buildOrderProcessingEmail({ customerName, items }) {
   return wrapEmail(`
     <h2 style="font-size: 18px;">Your order is being processed 📦</h2>
     <p>Hi ${customerName || 'there'},</p>
-    <p>Your Hijabi Bridal order is now being prepared for shipment.</p>
+    <p>Just confirming that we have your order and are processing it now! Please give us three days to ship your order.</p>
     ${itemsHtml(items)}
-    <p>We'll let you know as soon as it's on its way!</p>
+    <p>On it's way soon!</p>
     <p>With love,<br/>Hijabi Bridal</p>
+    <p>Questions? Write us at bridalhijabi@gmail.com</p>
   `)
 }
 
@@ -82,14 +83,45 @@ export function buildCustomsHoldEmail({ customerName, items }) {
   `)
 }
 
-export function buildShippedEmail({ customerName, items, trackingNumber, carrier, trackingUrl }) {
+// ⚠️ TRANSIT_TIMES duplicated here from the frontend's paypal-countries.ts
+// — the frontend and this Cloudflare Worker are separate codebases/repos
+// with no shared import path, so this data has to live in both places.
+// If the frontend's transit times ever change, this needs a matching
+// update, or the two will drift out of sync.
+const TRANSIT_TIMES = {
+  US: { days: '5–9 business days', carrier: 'USPS' },
+  DE: { days: '8–12 business days', carrier: 'DHL' },
+  FR: { days: '8–10 business days', carrier: 'La Poste / Colissimo' },
+  NL: { days: '8–12 business days', carrier: 'PostNL' },
+  BE: { days: '8–12 business days', carrier: 'bpost' },
+  GB: { days: '4–7 business days', carrier: 'Royal Mail / Evri' },
+  CA: { days: '7–12 business days', carrier: 'Canada Post' },
+  AU: { days: '6–9 business days', carrier: 'Australia Post' },
+  NZ: { days: '6–9 business days', carrier: 'Local Courier' },
+  JP: { days: '3–6 business days', carrier: 'Local Courier' },
+  KR: { days: '3–6 business days', carrier: 'Local Courier' },
+  SG: { days: '4–7 business days', carrier: 'SingPost' },
+  MY: { days: '4–7 business days', carrier: 'Pos Malaysia' },
+  AT: { days: '5–10 calendar days', carrier: 'DPD Austria' },
+  ES: { days: '7–13 calendar days', carrier: 'Correos' },
+  IT: { days: '10–20 calendar days', carrier: 'Local Courier' },
+  CH: { days: '14–18 calendar days', carrier: 'Local Courier' },
+}
+
+export function buildShippedEmail({ customerName, items, trackingNumber, carrier, trackingUrl, countryCode }) {
+  const transitInfo = countryCode ? TRANSIT_TIMES[countryCode] : null
+  const transitLine = transitInfo
+    ? `<p>Estimated delivery: ${transitInfo.days} via ${transitInfo.carrier} — should be sooner!</p>`
+    : ''
+
   return wrapEmail(`
     <h2 style="font-size: 18px;">Your Halal Nails are on the way! 📦</h2>
     <p>Hi ${customerName || 'there'},</p>
-    <p>Good news — your order has shipped!</p>
+    <p>Thanks so much for choosing Halal Nais. Your order has shipped!</p>
     ${itemsHtml(items)}
     ${trackingNumber ? `<p><strong>Tracking number:</strong> ${trackingNumber}</p>` : ''}
     ${carrier ? `<p><strong>Carrier:</strong> ${carrier}</p>` : ''}
+    ${transitLine}
     ${trackingUrl ? `<p><a href="${trackingUrl}" style="color: #db2777;">Track your package →</a></p>` : ''}
     <p>Can't wait for you to try them!</p>
     <p>With love,<br/>Hijabi Bridal</p>
@@ -119,6 +151,15 @@ export function buildAbandonedCartEmail({ customerName, items }) {
       </a>
     </p>
     <p>With love,<br/>Hijabi Bridal</p>
+  `)
+}
+
+// New — review request, sent 10 days after an order ships.
+export function buildReviewRequestEmail({ customerName }) {
+  return wrapEmail(`
+    <p>Hellow again! Got your stuff? We'd love to see how you wear them!</p>
+    <p>Snap a few pictures to share on our website! Send them to bridalhijabi@gmail.com and let us know your thoughts!</p>
+    <p>New nails coming soon. Ready?? <a href="https://hijabibridal.github.io/shop/category/halal-nails" style="color: #db2777;">Click here!</a></p>
   `)
 }
 
