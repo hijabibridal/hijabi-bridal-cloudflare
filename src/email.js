@@ -165,21 +165,7 @@ export function buildReviewRequestEmail({ customerName }) {
 
 // New — internal alert to the business inbox the moment a real order
 // comes in. Everything except actual payment/card data, but including
-// which method was used. Currently only "PayPal" is ever passed in
-// (from orderWebhook.js) — the case list below is ready for Google Pay,
-// Apple Pay, and Tilopay's methods once those go live through their own
-// separate handlers; nothing needs to change here when that happens,
-// just pass the right label from wherever that new handler lives.
-function paymentMethodLabel(method) {
-  switch (method) {
-    case 'PayPal': return 'PayPal'
-    case 'GooglePay': return 'Google Pay'
-    case 'ApplePay': return 'Apple Pay'
-    case 'TilopayCard': return 'Card (via Tilopay)'
-    default: return method || 'Unknown'
-  }
-}
-
+// which method was used (currently always "PayPal").
 export function buildNewOrderAlertEmail({
   customerName, email, phone,
   addressLine1, city, state, postalCode, country,
@@ -188,7 +174,7 @@ export function buildNewOrderAlertEmail({
 }) {
   return wrapEmail(`
     <h2 style="font-size: 18px;">You have an order!</h2>
-    <p><strong>Payment method:</strong> ${paymentMethodLabel(paymentMethod)}</p>
+    <p><strong>Payment method:</strong> ${paymentMethod}</p>
     <p><strong>PayPal transaction ID:</strong> ${paypalTxnId || 'N/A'}</p>
     <p><strong>LingXing order number:</strong> ${lingxingOrderNo || 'N/A — check LingXing directly if this is missing'}</p>
     <hr style="border: none; border-top: 1px solid #eee; margin: 16px 0;" />
