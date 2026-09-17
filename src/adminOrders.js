@@ -20,21 +20,22 @@ export async function handleListOrders(request, env) {
 
 const STATUS_HANDLERS = {
   processing: (order) => ({
-    subject: 'Your Hijabi Bridal order is being processed',
+    subject: 'Your Halal Nails order is being processed',
     html: buildOrderProcessingEmail({ customerName: order.customerName, items: order.items }),
   }),
   customs_hold: (order) => ({
-    subject: 'An update on your Hijabi Bridal order',
+    subject: 'An update on your Halal Nails order',
     html: buildCustomsHoldEmail({ customerName: order.customerName, items: order.items }),
   }),
   shipped: (order) => ({
-    subject: 'Your Hijabi Bridal order has shipped!',
+    subject: 'Your Halal Nails order has shipped!',
     html: buildShippedEmail({
       customerName: order.customerName,
       items: order.items,
       trackingNumber: order.trackingNumber,
       carrier: order.carrier,
       trackingUrl: order.trackingUrl,
+      countryCode: order.country,
     }),
   }),
 }
