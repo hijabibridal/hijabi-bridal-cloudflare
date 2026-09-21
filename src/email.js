@@ -146,8 +146,8 @@ export function buildAbandonedCartEmail({ customerName, items }) {
     <p>We noticed you didn't finish checking out — your Halal Nails are still waiting for you!</p>
     ${itemsHtml(items)}
     <p style="text-align: center; margin: 24px 0;">
-      <a href="https://hijabibridal.github.io/cart" style="background: #db2777; color: #fff; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 13px;">
-        Return to Cart
+      <a href="https://hijabibridal.github.io/shop/category/halal-nails" style="background: #db2777; color: #fff; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 13px;">
+        Shop Halal Nails
       </a>
     </p>
     <p>With love,<br/>Halal Nails</p>
