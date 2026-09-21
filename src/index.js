@@ -4,7 +4,7 @@ import { handleListOrders, handleUpdateOrderStatus } from './adminOrders.js'
 import { handleCreateOrder, handleCaptureOrder } from './googlePay.js'
 import { handleSendFeedback } from './feedback.js'
 import { handleAddressAutocomplete, handleAddressDetails } from './addressAutocomplete.js'
-import { handleCapturePartialCheckout, checkAbandonedCarts } from './abandonedCart.js'
+import { handleCapturePartialCheckout, checkAbandonedCarts, checkReviewRequestEmails } from './abandonedCart.js'
 
 export default {
   async fetch(request, env, ctx) {
@@ -40,9 +40,11 @@ export default {
   },
 
   // Cloudflare calls this automatically on the schedule set in
-  // wrangler.toml — this is what actually sends abandoned-cart emails,
-  // independent of any customer visiting the site.
+  // wrangler.toml — this is what actually sends abandoned-cart emails
+  // AND the 10-day review-request emails, independent of any customer
+  // visiting the site.
   async scheduled(event, env, ctx) {
     ctx.waitUntil(checkAbandonedCarts(env))
+    ctx.waitUntil(checkReviewRequestEmails(env))
   },
 }
