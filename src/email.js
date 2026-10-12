@@ -90,20 +90,20 @@ export function buildCustomsHoldEmail({ customerName, items }) {
 // update, or the two will drift out of sync.
 const TRANSIT_TIMES = {
   US: { days: '5–9 business days', carrier: 'USPS' },
-  DE: { days: '8–12 business days', carrier: 'DHL' },
-  FR: { days: '8–10 business days', carrier: 'La Poste / Colissimo' },
-  NL: { days: '8–12 business days', carrier: 'PostNL' },
-  BE: { days: '8–12 business days', carrier: 'bpost' },
-  GB: { days: '4–7 business days', carrier: 'Royal Mail / Evri' },
-  CA: { days: '7–12 business days', carrier: 'Canada Post' },
-  AU: { days: '6–9 business days', carrier: 'Australia Post' },
-  NZ: { days: '6–9 business days', carrier: 'Local Courier' },
+  DE: { days: '8–12 business days', carrier: 'Local Courier' },
+  FR: { days: '8–10 business days', carrier: 'Local Courier' },
+  NL: { days: '8–12 business days', carrier: 'Local Courier' },
+  BE: { days: '8–12 business days', carrier: 'Local Courier' },
+  GB: { days: '6-9 business days', carrier: 'Local Courier' },
+  CA: { days: '7–12 business days', carrier: 'Local Courier' },
+  AU: { days: '6–9 business days', carrier: 'Local Courier' },
+  NZ: { days: '6-10 calendar days', carrier: 'Local Courier' },
   JP: { days: '3–6 business days', carrier: 'Local Courier' },
   KR: { days: '3–6 business days', carrier: 'Local Courier' },
-  SG: { days: '4–7 business days', carrier: 'SingPost' },
-  MY: { days: '4–7 business days', carrier: 'Pos Malaysia' },
-  AT: { days: '5–10 calendar days', carrier: 'DPD Austria' },
-  ES: { days: '7–13 calendar days', carrier: 'Correos' },
+  SG: { days: '4–7 business days', carrier: 'Local Courier' },
+  MY: { days: '4–7 business days', carrier: 'Local Courier' },
+  AT: { days: '5–10 calendar days', carrier: 'Local Courier' },
+  ES: { days: '7–13 calendar days', carrier: 'Local Courier' },
   IT: { days: '10–20 calendar days', carrier: 'Local Courier' },
   CH: { days: '14–18 calendar days', carrier: 'Local Courier' },
 }
@@ -114,15 +114,31 @@ export function buildShippedEmail({ customerName, items, trackingNumber, carrier
     ? `<p>Estimated delivery: ${transitInfo.days} via ${transitInfo.carrier} — should be sooner!</p>`
     : ''
 
+  // 17TRACK doesn't cover USPS, so US orders skip the 17TRACK link.
+  // Every other country gets a button that opens 17TRACK with the
+  // tracking number already filled in.
+  const cleanTracking = trackingNumber ? String(trackingNumber).trim() : ''
+  const use17Track = !!cleanTracking && countryCode !== 'US'
+  const trackingBlock = use17Track
+    ? `<p>Track your package on 17Track.com here:</p>
+    <p style="text-align: center; margin: 24px 0;">
+      <a href="https://t.17track.net/en#nums=${encodeURIComponent(cleanTracking)}" style="background: #db2777; color: #fff; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 13px;">
+        Track Your Package
+      </a>
+    </p>`
+    : trackingUrl
+      ? `<p><a href="${trackingUrl}" style="color: #db2777;">Track your package →</a></p>`
+      : ''
+
   return wrapEmail(`
     <h2 style="font-size: 18px;">Your Halal Nails are on the way! 📦</h2>
     <p>Hi ${customerName || 'there'},</p>
-    <p>Thanks so much for choosing Halal Nais. Your order has shipped!</p>
+    <p>Thanks so much for choosing Halal Nails. Your order has shipped!</p>
     ${itemsHtml(items)}
     ${trackingNumber ? `<p><strong>Tracking number:</strong> ${trackingNumber}</p>` : ''}
     ${carrier ? `<p><strong>Carrier:</strong> ${carrier}</p>` : ''}
     ${transitLine}
-    ${trackingUrl ? `<p><a href="${trackingUrl}" style="color: #db2777;">Track your package →</a></p>` : ''}
+    ${trackingBlock}
     <p>Can't wait for you to try them!</p>
     <p>With love,<br/>Halal Nails</p>
   `)
